@@ -461,8 +461,7 @@ export default function HomeScreen() {
   const [rentRemark, setRentRemark] = useState('');
 
   // JSONBin 配置
-  const JSONBIN_BIN_ID = '69fca499c0954111d8ee2750';
-  const JSONBIN_API_KEY = '$2a$10$jb4ayJR9zkbyHVldeN/1WuuaspSfXnz42jM05XUlYnAy3lDXQmOsG';
+  const JSONBIN_BIN_ID = '69fcaa9ac0954111d8ee50fe';
   const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
 
   // 同步功能 - 上传数据到 JSONBin
@@ -478,8 +477,7 @@ export default function HomeScreen() {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'X-Access-Key': JSONBIN_API_KEY,
-        },
+                  },
         body: JSON.stringify({
           devices: allDevices,
           tenants: allTenants,
@@ -509,10 +507,7 @@ export default function HomeScreen() {
       setSyncing(true);
 
       const response = await fetch(JSONBIN_URL, {
-        method: 'GET',
-        headers: {
-          'X-Access-Key': JSONBIN_API_KEY,
-        },
+        method: 'GET'
       });
 
       if (response.ok) {
