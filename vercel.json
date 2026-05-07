@@ -1,7 +1,6 @@
 {
   "framework": null,
-  "buildCommand": null,
+  "buildCommand": "echo 'Static site - no build needed'",
   "outputDirectory": "public",
-  "installCommand": "npm install --ignore-scripts",
-  "devCommand": "echo 'No dev server needed'"
+  "installCommand": "echo 'Dependencies not needed for static site'"
 }
