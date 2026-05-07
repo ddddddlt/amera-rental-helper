@@ -1,4 +1,5 @@
 {
-  "buildCommand": "./build.sh",
-  "outputDirectory": "dist"
+  "rewrites": [
+    {"source": "/(.*)", "destination": "/public/index.html"}
+  ]
 }
