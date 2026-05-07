@@ -618,9 +618,7 @@ export default function DeviceScreen() {
                   <Text style={styles.closeButton}>X</Text>
                 </TouchableOpacity>
               </View>
-
-              <View style={{ flex: 1 }}>
-                <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 20 }}>
+              <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 20 }}>
                 <View style={styles.detailRow}>
                   <Text style={styles.detailLabel}>设备型号</Text>
                   <Text style={styles.detailValue}>{selectedDeviceForOrder.model}</Text>
@@ -678,7 +676,6 @@ export default function DeviceScreen() {
                   })()}
                 </View>
               </ScrollView>
-              </View>
             </View>
           </View>
         )}
@@ -899,8 +896,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     padding: 16,
-    maxHeight: '75%',
-    flex: 0,
+    maxHeight: '90%',
   },
   modalHeader: {
     flexDirection: 'row',
