@@ -47,7 +47,7 @@ export default function TabLayout() {
         options={{
           title: '首页',
           tabBarIcon: ({ color }) => (
-            <Text style={{ fontSize: 20 }}>🏠</Text>
+            <Text style={{ fontSize: 14, color, fontWeight: 'bold' }}>首页</Text>
           ),
         }}
       />
@@ -56,7 +56,7 @@ export default function TabLayout() {
         options={{
           title: '设备',
           tabBarIcon: ({ color }) => (
-            <Text style={{ fontSize: 20 }}>📷</Text>
+            <Text style={{ fontSize: 14, color, fontWeight: 'bold' }}>设备</Text>
           ),
         }}
       />
@@ -65,7 +65,7 @@ export default function TabLayout() {
         options={{
           title: '租客',
           tabBarIcon: ({ color }) => (
-            <Text style={{ fontSize: 20 }}>👥</Text>
+            <Text style={{ fontSize: 14, color, fontWeight: 'bold' }}>租客</Text>
           ),
         }}
       />
@@ -74,7 +74,7 @@ export default function TabLayout() {
         options={{
           title: '订单',
           tabBarIcon: ({ color }) => (
-            <Text style={{ fontSize: 20 }}>📋</Text>
+            <Text style={{ fontSize: 14, color, fontWeight: 'bold' }}>订单</Text>
           ),
         }}
       />
@@ -83,7 +83,7 @@ export default function TabLayout() {
         options={{
           title: '财务',
           tabBarIcon: ({ color }) => (
-            <Text style={{ fontSize: 20 }}>💰</Text>
+            <Text style={{ fontSize: 14, color, fontWeight: 'bold' }}>财务</Text>
           ),
         }}
       />
