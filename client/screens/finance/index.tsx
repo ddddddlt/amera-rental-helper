@@ -43,6 +43,7 @@ export default function FinanceScreen() {
   const [editForm, setEditForm] = useState({
     isReceived: false,
     destination: '',
+    amount: '',
   });
 
   // 转换订单为财务记录
@@ -110,6 +111,7 @@ export default function FinanceScreen() {
     setEditForm({
       isReceived: record.isReceived,
       destination: record.destination,
+      amount: record.amount.toString(),
     });
     setEditModalVisible(true);
   };
@@ -122,9 +124,17 @@ export default function FinanceScreen() {
     if (editingRecord.type === 'rent') {
       updates.rentReceived = editForm.isReceived;
       updates.rentDestination = editForm.destination;
+      const newAmount = parseFloat(editForm.amount);
+      if (!isNaN(newAmount)) {
+        updates.totalAmount = newAmount;
+      }
     } else {
       updates.depositReceived = editForm.isReceived;
       updates.depositDestination = editForm.destination;
+      const newAmount = parseFloat(editForm.amount);
+      if (!isNaN(newAmount)) {
+        updates.deposit = newAmount;
+      }
     }
 
     await updateOrder(editingRecord.orderId, updates);
@@ -318,10 +328,23 @@ export default function FinanceScreen() {
                           <Text className="text-gray-900 dark:text-white font-medium">{editingRecord.deviceModel}</Text>
                           <Text className="text-sm text-gray-500 dark:text-gray-400 mt-2 mb-1">租客</Text>
                           <Text className="text-gray-900 dark:text-white font-medium">{editingRecord.tenantName}</Text>
-                          <Text className="text-sm text-gray-500 dark:text-gray-400 mt-2 mb-1">金额</Text>
-                          <Text className="text-gray-900 dark:text-white font-bold text-lg">¥{editingRecord.amount.toFixed(2)}</Text>
                         </View>
                       )}
+
+                      <Text className="text-gray-900 dark:text-white font-medium mb-2">
+                        {editingRecord?.type === 'rent' ? '租金金额' : '押金金额'}
+                      </Text>
+                      <View className="flex-row items-center mb-4">
+                        <Text className="text-gray-900 dark:text-white text-lg font-bold mr-2">¥</Text>
+                        <TextInput
+                          className="flex-1 bg-gray-100 dark:bg-gray-700 rounded-lg px-4 py-3 text-gray-900 dark:text-white text-lg"
+                          value={editForm.amount}
+                          onChangeText={(text) => setEditForm({...editForm, amount: text})}
+                          placeholder="0.00"
+                          placeholderTextColor="#9CA3AF"
+                          keyboardType="decimal-pad"
+                        />
+                      </View>
 
                       <View className="flex-row items-center justify-between mb-4">
                         <Text className="text-gray-900 dark:text-white font-medium">
@@ -337,7 +360,7 @@ export default function FinanceScreen() {
                         {editingRecord?.type === 'rent' ? '租金去向' : '押金去向'}
                       </Text>
                       <TextInput
-                        className="bg-gray-100 dark:bg-gray-700 rounded-lg px-4 py-3 text-gray-900 dark:text-white"
+                        className="bg-gray-100 dark:bg-gray-700 rounded-lg px-4 py-3 text-gray-900 dark:text-white mb-4"
                         value={editForm.destination}
                         onChangeText={(text) => setEditForm({...editForm, destination: text})}
                         placeholder="如: 银行卡/微信/支付宝"
