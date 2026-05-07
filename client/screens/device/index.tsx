@@ -553,7 +553,7 @@ export default function DeviceScreen() {
                 </TouchableOpacity>
               </View>
 
-              <ScrollView showsVerticalScrollIndicator={false}>
+              <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1 }}>
                 {selectedDevice.imageUri ? (
                   <Image source={{ uri: selectedDevice.imageUri }} style={styles.detailImage} />
                 ) : (
@@ -619,7 +619,8 @@ export default function DeviceScreen() {
                 </TouchableOpacity>
               </View>
 
-              <ScrollView showsVerticalScrollIndicator={false}>
+              <View style={{ flex: 1 }}>
+                <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 20 }}>
                 <View style={styles.detailRow}>
                   <Text style={styles.detailLabel}>设备型号</Text>
                   <Text style={styles.detailValue}>{selectedDeviceForOrder.model}</Text>
@@ -677,6 +678,7 @@ export default function DeviceScreen() {
                   })()}
                 </View>
               </ScrollView>
+              </View>
             </View>
           </View>
         )}
@@ -897,7 +899,8 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     padding: 16,
-    maxHeight: '90%',
+    maxHeight: '75%',
+    flex: 0,
   },
   modalHeader: {
     flexDirection: 'row',
