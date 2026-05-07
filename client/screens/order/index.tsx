@@ -43,6 +43,9 @@ export default function OrderScreen() {
     rentDestination: '',
   });
   const [returnConfirm, setReturnConfirm] = useState(false);
+  const [returnOrderId, setReturnOrderId] = useState<string | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState(false);
+  const [deleteOrderId, setDeleteOrderId] = useState<string | null>(null);
   const [importModalVisible, setImportModalVisible] = useState(false);
   const [importData, setImportData] = useState('');
   const [exportModalVisible, setExportModalVisible] = useState(false);
@@ -372,9 +375,10 @@ export default function OrderScreen() {
                     </TouchableOpacity>
                     <TouchableOpacity
                       className="px-3 py-2 bg-red-500 rounded"
-                      onPress={async () => {
+                      onPress={() => {
                         console.log('删除按钮被点击，order.id:', order.id);
-                        await deleteOrder(order.id);
+                        setDeleteOrderId(order.id);
+                        setDeleteConfirm(true);
                       }}
                     >
                       <Text className="text-white text-sm">删除</Text>
@@ -621,6 +625,44 @@ export default function OrderScreen() {
                     onPress={confirmReturn}
                   >
                     <Text className="text-white text-center font-medium">确认</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
+        )}
+
+        {/* 确认删除弹窗 */}
+        {deleteConfirm && deleteOrderId && (
+          <Modal visible={true} transparent animationType="fade">
+            <View className="flex-1 bg-black/50 justify-center items-center px-6">
+              <View className="bg-white rounded-2xl p-6 w-full">
+                <Text className="text-lg font-bold text-gray-900 text-center mb-2">确认删除</Text>
+                <Text className="text-gray-600 text-center mb-4">
+                  确定要删除此订单吗？此操作不可恢复。
+                </Text>
+                
+                <View className="flex-row gap-3">
+                  <TouchableOpacity
+                    className="flex-1 py-3 bg-gray-200 rounded-xl"
+                    onPress={() => {
+                      setDeleteConfirm(false);
+                      setDeleteOrderId(null);
+                    }}
+                  >
+                    <Text className="text-gray-700 text-center font-medium">取消</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    className="flex-1 py-3 bg-red-500 rounded-xl"
+                    onPress={async () => {
+                      if (deleteOrderId) {
+                        await deleteOrder(deleteOrderId);
+                        setDeleteConfirm(false);
+                        setDeleteOrderId(null);
+                      }
+                    }}
+                  >
+                    <Text className="text-white text-center font-medium">删除</Text>
                   </TouchableOpacity>
                 </View>
               </View>
