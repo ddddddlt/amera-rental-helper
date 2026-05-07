@@ -20,7 +20,7 @@ import { useData } from '@/contexts/DataContext';
 
 export default function OrderScreen() {
   const insets = useSafeAreaInsets();
-  const { orders: contextOrders, devices: contextDevices, refreshKey, completeOrder } = useData();
+  const { orders: contextOrders, devices: contextDevices, refreshKey, completeOrder, deleteOrder } = useData();
   const [orders, setOrders] = useState<any[]>([]);
   const [devices, setDevices] = useState<any[]>([]);
   const [tenants, setTenants] = useState<any[]>([]);
@@ -380,8 +380,7 @@ export default function OrderScreen() {
                             text: '删除',
                             style: 'destructive',
                             onPress: async () => {
-                              await OrderModel.delete(order.id);
-                              loadData();
+                              await deleteOrder(order.id);
                             },
                           },
                         ]);
