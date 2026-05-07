@@ -76,6 +76,15 @@ export default function TabLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="finance"
+        options={{
+          title: '财务',
+          tabBarIcon: ({ color }) => (
+            <FontAwesome6 name="money-bill-wave" size={24} color={color} />
+          ),
+        }}
+      />
     </Tabs>
   );
 }
