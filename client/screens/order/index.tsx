@@ -372,18 +372,9 @@ export default function OrderScreen() {
                     </TouchableOpacity>
                     <TouchableOpacity
                       className="px-3 py-2 bg-red-500 rounded"
-                      onPress={() => {
-                        setSelectedOrder(order);
-                        Alert.alert('确认删除', '确定要删除这条租赁订单吗？', [
-                          { text: '取消', style: 'cancel' },
-                          {
-                            text: '删除',
-                            style: 'destructive',
-                            onPress: async () => {
-                              await deleteOrder(order.id);
-                            },
-                          },
-                        ]);
+                      onPress={async () => {
+                        console.log('删除按钮被点击，order.id:', order.id);
+                        await deleteOrder(order.id);
                       }}
                     >
                       <Text className="text-white text-sm">删除</Text>
