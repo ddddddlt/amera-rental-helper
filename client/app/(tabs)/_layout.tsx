@@ -1,7 +1,6 @@
 import { Tabs } from 'expo-router';
-import { Platform } from 'react-native';
+import { Platform, Text } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { FontAwesome6 } from '@expo/vector-icons';
 
 export default function TabLayout() {
   const insets = useSafeAreaInsets();
@@ -48,7 +47,7 @@ export default function TabLayout() {
         options={{
           title: '首页',
           tabBarIcon: ({ color }) => (
-            <FontAwesome6 name="house" size={24} color={color} />
+            <Text style={{ fontSize: 20 }}>🏠</Text>
           ),
         }}
       />
@@ -57,7 +56,7 @@ export default function TabLayout() {
         options={{
           title: '设备',
           tabBarIcon: ({ color }) => (
-            <FontAwesome6 name="camera" size={24} color={color} />
+            <Text style={{ fontSize: 20 }}>📷</Text>
           ),
         }}
       />
@@ -66,7 +65,7 @@ export default function TabLayout() {
         options={{
           title: '租客',
           tabBarIcon: ({ color }) => (
-            <FontAwesome6 name="users" size={24} color={color} />
+            <Text style={{ fontSize: 20 }}>👥</Text>
           ),
         }}
       />
@@ -75,7 +74,7 @@ export default function TabLayout() {
         options={{
           title: '订单',
           tabBarIcon: ({ color }) => (
-            <FontAwesome6 name="clipboard-list" size={24} color={color} />
+            <Text style={{ fontSize: 20 }}>📋</Text>
           ),
         }}
       />
@@ -84,7 +83,7 @@ export default function TabLayout() {
         options={{
           title: '财务',
           tabBarIcon: ({ color }) => (
-            <FontAwesome6 name="money-bill-wave" size={24} color={color} />
+            <Text style={{ fontSize: 20 }}>💰</Text>
           ),
         }}
       />
