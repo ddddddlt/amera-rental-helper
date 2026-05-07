@@ -15,8 +15,8 @@ export default function TabLayout() {
             backgroundColor: '#FFFFFF',
             borderTopWidth: 1,
             borderTopColor: '#E5E6EB',
-            paddingTop: 8,
-            paddingBottom: Platform.OS === 'ios' ? Math.max(insets.bottom, 10) : 10,
+            paddingTop: 4,
+            paddingBottom: Platform.OS === 'ios' ? Math.max(insets.bottom, 12) : 10,
             shadowColor: '#000',
             shadowOffset: { width: 0, height: -2 },
             shadowOpacity: 0.05,
@@ -26,10 +26,9 @@ export default function TabLayout() {
           tabBarActiveTintColor: '#165DFF',
           tabBarInactiveTintColor: '#86909C',
           tabBarLabelStyle: {
-            fontSize: 11,
+            fontSize: 12,
             fontWeight: '500',
-            marginTop: 3,
-            paddingBottom: 2,
+            marginTop: 4,
           },
         }}
       >
