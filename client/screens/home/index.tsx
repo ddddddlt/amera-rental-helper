@@ -460,47 +460,49 @@ export default function HomeScreen() {
   const [rentEndDate, setRentEndDate] = useState('');
   const [rentRemark, setRentRemark] = useState('');
 
-  // 同步功能 - 上传数据
-  const handleSyncUpload = async () => {
-    try {
-      setSyncing(true);
-      
-      const allDevices = await DeviceModel.getAll();
-      const allTenants = await TenantModel.getAll();
-      const allOrders = await OrderModel.getAll();
+	// JSONBin 配置
+	const JSONBIN_BIN_ID = '69fca499c0954111d8ee2750';
+	const JSONBIN_API_KEY = '$2a$10$jb4ayJR9zkbyHVldeN/1WuuaspSfXnz42jM05XUlYnAy3lDXQmOsG';
+	const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
 
-      /**
-       * 服务端文件：server/src/index.ts
-       * 接口：POST /api/v1/sync
-       * Body 参数：devices: any[], tenants: any[], orders: any[], deviceId: string
-       */
-      const response = await fetch(`${process.env.EXPO_PUBLIC_BACKEND_BASE_URL}/api/v1/sync`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          devices: allDevices,
-          tenants: allTenants,
-          orders: allOrders,
-          deviceId,
-        }),
-      });
+	// 同步功能 - 上传数据到 JSONBin
+	const handleSyncUpload = async () => {
+		try {
+			setSyncing(true);
+			
+			const allDevices = await DeviceModel.getAll();
+			const allTenants = await TenantModel.getAll();
+			const allOrders = await OrderModel.getAll();
 
-      if (response.ok) {
-        const result = await response.json();
-        setLastSyncTime(new Date().toLocaleString());
-        Alert.alert('成功', '数据已上传到云端');
-      } else {
-        Alert.alert('错误', '上传失败');
-      }
-    } catch (error) {
-      console.error('Sync upload error:', error);
-      Alert.alert('错误', '上传失败，请检查网络连接');
-    } finally {
-      setSyncing(false);
-    }
-  };
+			const response = await fetch(JSONBIN_URL, {
+				method: 'PUT',
+				headers: {
+					'Content-Type': 'application/json',
+					'X-Access-Key': JSONBIN_API_KEY,
+				},
+				body: JSON.stringify({
+					devices: allDevices,
+					tenants: allTenants,
+					orders: allOrders,
+					deviceId,
+					updatedAt: new Date().toISOString(),
+				}),
+			});
+
+			if (response.ok) {
+				setLastSyncTime(new Date().toLocaleString());
+				Alert.alert('成功', '数据已上传到云端');
+			} else {
+				Alert.alert('错误', '上传失败');
+			}
+		} catch (error) {
+			console.error('Sync upload error:', error);
+			Alert.alert('错误', '上传失败，请检查网络连接');
+		} finally {
+			setSyncing(false);
+		}
+	};
+
 
   // 同步功能 - 下载数据
   const handleSyncDownload = async () => {
@@ -544,41 +546,58 @@ export default function HomeScreen() {
       const year = date.getFullYear();
       const month = String(date.getMonth() + 1).padStart(2, '0');
       const day = String(date.getDate()).padStart(2, '0');
-      const hour = String(date.getHours()).padStart(2, '0');
-      const minute = String(date.getMinutes()).padStart(2, '0');
-      return `${year}-${month}-${day} ${hour}:${minute}`;
-    } catch {
-      return createdAt;
-    }
-  };
-  const [calendarVisible, setCalendarVisible] = useState(false);
-  const [deviceHistoryModal, setDeviceHistoryModal] = useState(false);
-  const [showNewTenantForm, setShowNewTenantForm] = useState(false);
-  const [newTenantName, setNewTenantName] = useState('');
-  const [newTenantPhone, setNewTenantPhone] = useState('');
-  const [newTenantRemark, setNewTenantRemark] = useState('');
-  // 同步相关状态
-  const [syncing, setSyncing] = useState(false);
-  const [lastSyncTime, setLastSyncTime] = useState<string | null>(null);
-  const [deviceId] = useState(() => 'dev_' + Math.random().toString(36).substr(2, 9));
-  const [orderDetailModal, setOrderDetailModal] = useState(false);
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-  const [appointmentDetailModal, setAppointmentDetailModal] = useState(false);
-  const [selectedDeviceForAppointment, setSelectedDeviceForAppointment] = useState<Device | null>(null);
-  const [appointmentOrders, setAppointmentOrders] = useState<Order[]>([]);
-  const [editOrderModal, setEditOrderModal] = useState(false);
-  const [editingOrder, setEditingOrder] = useState<Order | null>(null);
-  const [editOrderData, setEditOrderData] = useState({
-    startDate: '',
-    endDate: '',
-    startTime: '10:00',
-    endTime: '18:00',
-    remark: '',
-    deposit: '',
-    depositReceived: false,
-    depositDestination: '',
-    rentReceived: false,
-    rentDestination: '',
+	// 同步功能 - 从 JSONBin 下载数据
+	const handleSyncDownload = async () => {
+		try {
+			setSyncing(true);
+
+			const response = await fetch(JSONBIN_URL, {
+				method: 'GET',
+				headers: {
+					'X-Access-Key': JSONBIN_API_KEY,
+				},
+			});
+
+			if (response.ok) {
+				const result = await response.json();
+				const data = result.record;
+
+				if (data) {
+					await DeviceModel.clear();
+					await TenantModel.clear();
+					await OrderModel.clear();
+
+					for (const device of data.devices || []) {
+						await DeviceModel.add(device);
+					}
+					for (const tenant of data.tenants || []) {
+						await TenantModel.add(tenant);
+					}
+					for (const order of data.orders || []) {
+						await OrderModel.add(order);
+					}
+
+					setLastSyncTime(new Date().toLocaleString());
+					Alert.alert('成功', '数据已从云端下载');
+					
+					// 刷新数据
+					loadDevices();
+					loadTenants();
+					loadOrders();
+				} else {
+					Alert.alert('提示', '云端没有数据');
+				}
+			} else {
+				Alert.alert('错误', '下载失败');
+			}
+		} catch (error) {
+			console.error('Sync download error:', error);
+			Alert.alert('错误', '下载失败，请检查网络连接');
+		} finally {
+			setSyncing(false);
+		}
+	};
+
   });
 
   // 今日日期格式化（使用阿拉伯数字）
