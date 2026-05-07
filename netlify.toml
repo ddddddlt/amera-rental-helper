@@ -1,7 +1,9 @@
 [build]
   base = "client"
   command = "npx expo export"
-  publish = "client/web"
+  publish = "web"
 
 [build.environment]
-  NODE_VERSION = "18"
+  NODE_VERSION = "20"
+  NPM_CONFIG_PRODUCTION = "false"
+  YARN_ENABLED = "false"
