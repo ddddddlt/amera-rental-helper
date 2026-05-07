@@ -1,6 +1,6 @@
 [build]
-  command = "cd client && npx expo export:web"
-  publish = "client/web"
+  command = "npx expo export:web"
+  publish = "web"
 
 [build.environment]
   NODE_VERSION = "18"
