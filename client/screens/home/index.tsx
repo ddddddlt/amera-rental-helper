@@ -460,6 +460,84 @@ export default function HomeScreen() {
   const [rentEndDate, setRentEndDate] = useState('');
   const [rentRemark, setRentRemark] = useState('');
 
+  // 同步功能 - 上传数据
+  const handleSyncUpload = async () => {
+    try {
+      setSyncing(true);
+      
+      const allDevices = await DeviceModel.getAll();
+      const allTenants = await TenantModel.getAll();
+      const allOrders = await OrderModel.getAll();
+
+      /**
+       * 服务端文件：server/src/index.ts
+       * 接口：POST /api/v1/sync
+       * Body 参数：devices: any[], tenants: any[], orders: any[], deviceId: string
+       */
+      const response = await fetch(`${process.env.EXPO_PUBLIC_BACKEND_BASE_URL}/api/v1/sync`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          devices: allDevices,
+          tenants: allTenants,
+          orders: allOrders,
+          deviceId,
+        }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        setLastSyncTime(new Date().toLocaleString());
+        Alert.alert('成功', '数据已上传到云端');
+      } else {
+        Alert.alert('错误', '上传失败');
+      }
+    } catch (error) {
+      console.error('Sync upload error:', error);
+      Alert.alert('错误', '上传失败，请检查网络连接');
+    } finally {
+      setSyncing(false);
+    }
+  };
+
+  // 同步功能 - 下载数据
+  const handleSyncDownload = async () => {
+    try {
+      setSyncing(true);
+      
+      /**
+       * 服务端文件：server/src/index.ts
+       * 接口：GET /api/v1/sync
+       */
+      const response = await fetch(`${process.env.EXPO_PUBLIC_BACKEND_BASE_URL}/api/v1/sync`);
+
+      if (response.ok) {
+        const data = await response.json();
+        
+        // 保存到本地
+        if (data.devices) await DeviceModel.saveAll(data.devices);
+        if (data.tenants) await TenantModel.saveAll(data.tenants);
+        if (data.orders) await OrderModel.saveAll(data.orders);
+        
+        // 刷新数据
+        await refreshData();
+        setLastSyncTime(new Date().toLocaleString());
+        Alert.alert('成功', '数据已从云端同步');
+      } else if (response.status === 404) {
+        Alert.alert('提示', '云端暂无数据');
+      } else {
+        Alert.alert('错误', '下载失败');
+      }
+    } catch (error) {
+      console.error('Sync download error:', error);
+      Alert.alert('错误', '下载失败，请检查网络连接');
+    } finally {
+      setSyncing(false);
+    }
+  };
+
   const formatCreatedAt = (createdAt: string) => {
     try {
       const date = new Date(createdAt);
@@ -479,6 +557,10 @@ export default function HomeScreen() {
   const [newTenantName, setNewTenantName] = useState('');
   const [newTenantPhone, setNewTenantPhone] = useState('');
   const [newTenantRemark, setNewTenantRemark] = useState('');
+  // 同步相关状态
+  const [syncing, setSyncing] = useState(false);
+  const [lastSyncTime, setLastSyncTime] = useState<string | null>(null);
+  const [deviceId] = useState(() => 'dev_' + Math.random().toString(36).substr(2, 9));
   const [orderDetailModal, setOrderDetailModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [appointmentDetailModal, setAppointmentDetailModal] = useState(false);
@@ -1181,6 +1263,26 @@ export default function HomeScreen() {
           >
             <Text className="text-[#165DFF] text-sm font-medium">日历</Text>
           </TouchableOpacity>
+          <TouchableOpacity
+            className={`px-3 py-2 rounded-lg ${syncing ? 'bg-gray-200' : 'bg-green-100'}`}
+            onPress={handleSyncUpload}
+            disabled={syncing}
+            activeOpacity={0.7}
+          >
+            <Text className={`text-sm font-medium ${syncing ? 'text-gray-400' : 'text-green-700'}`}>
+              {syncing ? '同步中...' : '上传'}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            className={`px-3 py-2 rounded-lg ${syncing ? 'bg-gray-200' : 'bg-blue-100'}`}
+            onPress={handleSyncDownload}
+            disabled={syncing}
+            activeOpacity={0.7}
+          >
+            <Text className={`text-sm font-medium ${syncing ? 'text-gray-400' : 'text-blue-700'}`}>
+              {syncing ? '同步中...' : '下载'}
+            </Text>
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -1190,7 +1292,7 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
       >
         {/* 今日日期 + 刷新按钮 + 主题切换 */}
-        <View className="flex-row items-center justify-center px-4 pt-4">
+        <View className="flex-row items-center justify-center px-4 pt-4 flex-wrap">
           <Text className="text-lg font-semibold text-[#1D2129]">
             {todayFormatted}
           </Text>
@@ -1212,6 +1314,13 @@ export default function HomeScreen() {
             </Text>
           </TouchableOpacity>
         </View>
+        {lastSyncTime && (
+          <View className="px-4 pt-2">
+            <Text className="text-xs text-gray-400 text-center">
+              最后同步: {lastSyncTime}
+            </Text>
+          </View>
+        )}
 
         {/* 数据看板 */}
         <View className="flex-row px-4 pt-4 gap-3">
