@@ -26,6 +26,8 @@ export default function OrderScreen() {
   const [tenants, setTenants] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [dateRangeStart, setDateRangeStart] = useState<string>('');
+  const [dateRangeEnd, setDateRangeEnd] = useState<string>('');
   const [detailModalVisible, setDetailModalVisible] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [editModalVisible, setEditModalVisible] = useState(false);
@@ -85,7 +87,20 @@ export default function OrderScreen() {
   const filteredOrders = (statusFilter === 'all' 
     ? orders 
     : orders.filter(o => o.status === statusFilter)
-  ).sort((a, b) => 
+  ).filter(order => {
+    // 时间段筛选
+    if (dateRangeStart) {
+      const orderDate = new Date(order.startDate);
+      const startDate = new Date(dateRangeStart);
+      if (orderDate < startDate) return false;
+    }
+    if (dateRangeEnd) {
+      const orderDate = new Date(order.startDate);
+      const endDate = new Date(dateRangeEnd);
+      if (orderDate > endDate) return false;
+    }
+    return true;
+  }).sort((a, b) => 
     new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
 

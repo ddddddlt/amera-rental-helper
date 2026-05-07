@@ -252,8 +252,13 @@ export default function DeviceScreen() {
     }
   };
 
-  // 获取设备的所有有效预约订单
+  // 获取设备的所有订单（包括历史订单）
   const getDeviceOrders = (deviceId: string): Order[] => {
+    return orders.filter(order => order.deviceId === deviceId);
+  };
+
+  // 获取设备的有效预约订单
+  const getDeviceActiveOrders = (deviceId: string): Order[] => {
     const now = new Date();
     return orders.filter(order => 
       order.deviceId === deviceId && 
@@ -264,7 +269,7 @@ export default function DeviceScreen() {
 
   // 检查设备是否有预约
   const hasActiveOrders = (deviceId: string): boolean => {
-    return getDeviceOrders(deviceId).length > 0;
+    return getDeviceActiveOrders(deviceId).length > 0;
   };
 
   // 打开预约详情弹窗
@@ -341,16 +346,11 @@ export default function DeviceScreen() {
                         </Text>
                         <View style={styles.tagRow}>
                           {hasActiveOrders(device.id) ? (
-                            <TouchableOpacity
-                              onPress={() => openOrderDetailModal(device)}
-                              activeOpacity={0.7}
-                            >
-                              <View style={[styles.tag, { backgroundColor: '#FFF7E6' }]}>
-                                <Text style={[styles.tagText, { color: '#FF9500' }]}>
-                                  有预约 ({getDeviceOrders(device.id).length})
-                                </Text>
-                              </View>
-                            </TouchableOpacity>
+                            <View style={[styles.tag, { backgroundColor: '#FFF7E6' }]}>
+                              <Text style={[styles.tagText, { color: '#FF9500' }]}>
+                                有预约 ({getDeviceActiveOrders(device.id).length})
+                              </Text>
+                            </View>
                           ) : (
                             <View style={[styles.tag, { backgroundColor: statusStyle.bg }]}>
                               <Text style={[styles.tagText, { color: statusStyle.text }]}>
@@ -370,6 +370,13 @@ export default function DeviceScreen() {
                   
                   {/* 底部操作按钮 - 独立区域 */}
                   <View style={styles.actionButtons}>
+                    <TouchableOpacity
+                      onPress={() => openOrderDetailModal(device)}
+                      style={styles.historyButton}
+                      activeOpacity={0.7}
+                    >
+                      <Text style={styles.historyButtonText}>历史订单</Text>
+                    </TouchableOpacity>
                     <TouchableOpacity
                       onPress={() => openAddModal(device)}
                       style={styles.editButton}
@@ -602,7 +609,7 @@ export default function DeviceScreen() {
             />
             <View style={[styles.modalContent, { paddingBottom: Math.max(insets.bottom, 16) }]}>
               <View style={styles.modalHeader}>
-                <Text style={styles.modalTitle}>预约详情</Text>
+                <Text style={styles.modalTitle}>历史订单</Text>
                 <TouchableOpacity onPress={() => setOrderDetailModalVisible(false)}>
                   <Text style={styles.closeButton}>X</Text>
                 </TouchableOpacity>
@@ -623,17 +630,29 @@ export default function DeviceScreen() {
                 <View style={styles.orderListSection}>
                   {(() => {
                     const deviceOrders = getDeviceOrders(selectedDeviceForOrder.id).sort((a, b) => 
-                      new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+                      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
                     );
                     if (deviceOrders.length === 0) {
                       return (
-                        <Text style={styles.noOrderText}>暂无预约订单</Text>
+                        <Text style={styles.noOrderText}>暂无历史订单</Text>
                       );
                     }
                     return deviceOrders.map((order, index) => (
                       <View key={order.id} style={styles.orderItem}>
                         <View style={styles.orderItemHeader}>
-                          <Text style={styles.orderIndex}>预约 {index + 1}</Text>
+                          <Text style={styles.orderIndex}>订单 {index + 1}</Text>
+                          <View style={[styles.orderStatusTag, { 
+                            backgroundColor: order.status === 'active' ? '#E3F2FD' : 
+                                           order.status === 'completed' ? '#E8F5E9' : '#FFEBEE'
+                          }]}>
+                            <Text style={[styles.orderStatusText, { 
+                              color: order.status === 'active' ? '#1565C0' : 
+                                     order.status === 'completed' ? '#2E7D32' : '#C62828'
+                            }]}>
+                              {order.status === 'active' ? '进行中' : 
+                               order.status === 'completed' ? '已归还' : '已取消'}
+                            </Text>
+                          </View>
                         </View>
                         <View style={styles.detailRow}>
                           <Text style={styles.detailLabel}>租客姓名</Text>
@@ -838,6 +857,18 @@ const styles = StyleSheet.create({
   },
   editButtonText: {
     color: '#666',
+    fontSize: 12,
+  },
+  historyButton: {
+    backgroundColor: '#E3F2FD',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 6,
+    minWidth: 48,
+    alignItems: 'center',
+  },
+  historyButtonText: {
+    color: '#1565C0',
     fontSize: 12,
   },
   deleteButton: {
@@ -1079,16 +1110,28 @@ const styles = StyleSheet.create({
     padding: 12,
     marginBottom: 12,
   },
+  orderIndex: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+  },
   orderItemHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     borderBottomWidth: 1,
     borderBottomColor: '#E5E7EB',
     paddingBottom: 8,
     marginBottom: 8,
   },
-  orderIndex: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
+  orderStatusTag: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
+  },
+  orderStatusText: {
+    fontSize: 12,
+    fontWeight: '500',
   },
   noOrderText: {
     fontSize: 14,

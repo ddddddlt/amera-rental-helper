@@ -1181,13 +1181,6 @@ export default function HomeScreen() {
           >
             <Text className="text-[#165DFF] text-sm font-medium">日历</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            className="bg-[#165DFF] px-3 py-2 rounded-lg"
-            onPress={handleAddDevice}
-            activeOpacity={0.7}
-          >
-            <Text className="text-white text-sm font-medium">新增设备</Text>
-          </TouchableOpacity>
         </View>
       </View>
 
