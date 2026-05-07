@@ -1,6 +1,6 @@
 {
   "framework": null,
-  "buildCommand": "echo 'Static site - no build needed'",
-  "outputDirectory": "public",
-  "installCommand": "echo 'Dependencies not needed for static site'"
+  "buildCommand": "./build.sh",
+  "outputDirectory": "dist",
+  "installCommand": ""
 }
